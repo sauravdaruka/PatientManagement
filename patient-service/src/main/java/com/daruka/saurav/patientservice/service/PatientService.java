@@ -4,6 +4,7 @@ import com.daruka.saurav.patientservice.dto.PatientRequestDTO;
 import com.daruka.saurav.patientservice.dto.PatientResponseDTO;
 import com.daruka.saurav.patientservice.exception.EmailAlreadyExistsException;
 import com.daruka.saurav.patientservice.exception.PatientNotFoundException;
+import com.daruka.saurav.patientservice.grpc.BillingServiceGrpcClient;
 import com.daruka.saurav.patientservice.mapper.PatientMapper;
 import com.daruka.saurav.patientservice.model.Patient;
 import com.daruka.saurav.patientservice.repository.PatientRepository;
@@ -17,9 +18,11 @@ import java.util.UUID;
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
 
-    public PatientService(PatientRepository patientRepository) {
+    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient) {
         this.patientRepository = patientRepository;
+        this.billingServiceGrpcClient = billingServiceGrpcClient;
     }
 
     public List<PatientResponseDTO> getAllPatients() {
@@ -35,7 +38,7 @@ public class PatientService {
 
         Patient newPatient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
 
-//        billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(), newPatient.getEmail());
+        billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(), newPatient.getEmail());
 //        kafkaProducer.sendEvent(newPatient);
 
         return PatientMapper.toDTO(newPatient);
