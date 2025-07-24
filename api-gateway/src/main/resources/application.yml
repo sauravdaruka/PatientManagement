@@ -1,12 +1,28 @@
 server:
-  port: 4004 # Gateway listens on port 4004
+  port: 4004
 
 spring:
   cloud:
     gateway:
       server:
-        webflux: # Note the new 'server.webflux' prefix
+        webflux:
           routes:
+            # Route for /auth/** to auth-service
+            - id: auth-service-route
+              uri: http://auth-service:4005
+              predicates:
+                - Path=/auth/**
+              filters:
+                - StripPrefix=1
+
+            # Route for /api/docs/auth to auth-service /v3/api-docs
+            - id: api-docs-auth-route
+              uri: http://auth-service:4005
+              predicates:
+                - Path=/api-docs/auth
+              filters:
+                - RewritePath=/api-docs/auth,/v3/api-docs
+
             # Route for /api/patients/** to patient-service
             - id: patient-service-route
               uri: http://patient-service:4000
@@ -22,8 +38,3 @@ spring:
                 - Path=/api-docs/patients
               filters:
                 - RewritePath=/api-docs/patients,/v3/api-docs
-
-
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG
