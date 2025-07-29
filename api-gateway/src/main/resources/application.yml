@@ -30,6 +30,7 @@ spring:
                 - Path=/api/patients/**
               filters:
                 - StripPrefix=1
+                - JwtValidation          #Looks for class with prefix 'GatewayFilterFactory' i.e. JwtValidationGatewayFilterFactory
 
             # Route for /api/docs/patients to patient-service /v3/api-docs
             - id: api-docs-patient-route
